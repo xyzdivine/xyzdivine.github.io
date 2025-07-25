@@ -1,0 +1,794 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap'); /* Satoshi Font */
+
+body {
+    margin: 0;
+    font-family: 'Satoshi', sans-serif; /* Changed font to Satoshi */
+    background-color: #0b1a2b; /* Dark blue background - fallback */
+    color: #aaccff; /* Light blue text color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    /* Custom white dot cursor */
+    cursor: url('white_dot_cursor.png') 8 8, none; /* Path to your dot image, 8 8 for hotspot center, none for fallback */
+}
+
+/* Splash Screen Styles */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    color: white; /* Text color */
+    /* Cursor will inherit from body, or set explicitly if needed for this screen */
+    transition: opacity 1s ease-out, visibility 1s ease-out;
+    overflow: hidden;
+}
+
+.splash-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('background.jpg');
+    filter: brightness(0.6) blur(10px); /* Darken and blur the background image */
+    -webkit-filter: brightness(0.6) blur(10px);
+    z-index: -1; /* Place behind the content */
+    transition: opacity 1s ease-out;
+}
+
+.splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.splash-screen.hidden::before {
+    opacity: 0;
+}
+
+.splash-content {
+    text-align: center;
+    position: relative;
+    z-index: 10000;
+}
+
+.splash-content h1 {
+    font-size: 1.5em;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.5px;
+    color: white;
+    text-shadow: none;
+    animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.02); opacity: 0.95; }
+}
+
+
+/* Main Content (Initially Hidden) */
+.main-content {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 1s ease-in, visibility 1s ease-in;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.main-content.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Main Site Background Image */
+.background-full-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.8;
+    z-index: -1;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 40px);
+}
+
+.header {
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+.header h1 {
+    font-size: 3em;
+    margin: 10px 0 5px;
+    color: #9dc6ff;
+}
+
+.header p {
+    font-size: 1.1em;
+    color: #aaccff;
+    margin-bottom: 20px;
+}
+
+.social-links {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-icon {
+    color: #9dc6ff;
+    font-size: 2.5em;
+    transition: color 0.3s ease, transform 0.2s ease;
+    text-shadow: 0 0 8px rgba(157, 198, 255, 0.5);
+    /* For specific elements like social icons, you might want to adjust cursor type */
+    cursor: pointer; /* Keeps the pointer hand for clickable elements */
+}
+
+.social-icon:hover {
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* Music Player Styles - Matching image_c6091c.png */
+.music-player {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.1); /* Very subtle dark overlay */
+    backdrop-filter: blur(5px); /* Soft blur effect */
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding: 10px 15px; /* Adjusted padding for a compact look */
+    margin-bottom: 40px;
+    width: 100%;
+    max-width: 550px; /* Adjusted width to match image scale */
+    box-sizing: border-box;
+    cursor: default; /* Override to default cursor for the player area */
+}
+
+.album-art {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px; /* Consistent with image */
+    margin-right: 15px; /* Spacing from text content */
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.player-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Align text left within content */
+}
+
+.song-metadata {
+    margin-bottom: 5px; /* Space between title and progress line */
+}
+
+#playerSongTitle {
+    font-size: 1.05em;
+    color: #ffffff; /* Pure white */
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.progress-line-and-times {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    font-size: 0.78em;
+    color: rgba(255, 255, 255, 0.7); /* Lighter grey for times */
+    gap: 5px; /* Gap between time, line, and buttons */
+}
+
+#currentTime {
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+#duration {
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.progress-bar-container {
+    flex-grow: 1;
+    height: 1px; /* Very thin line */
+    background: rgba(255, 255, 255, 0.3); /* Light grey line background */
+    border-radius: 0.5px;
+    position: relative;
+    cursor: pointer; /* Use pointer for the seek bar */
+    margin: 0; /* Remove any default margins */
+}
+
+/* Seek slider is now the progress indicator itself */
+.seek-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Make it cover the container for easy dragging */
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: grab; /* Use grab for the slider itself */
+    z-index: 2; /* Above the line */
+    margin: 0;
+    padding: 0;
+}
+
+/* Custom slider thumb (the moving dot) */
+.seek-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 6px; /* Small dot */
+    height: 6px;
+    background-color: white; /* White dot */
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -2.5px; /* Center on 1px track ( (6-1)/2 ) */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7); /* Subtle glow */
+    transition: transform 0.2s ease;
+}
+.seek-slider::-moz-range-thumb {
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -2.5px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s ease;
+}
+.seek-slider::-ms-thumb {
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -2.5px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s ease;
+}
+
+.seek-slider::-webkit-slider-thumb:hover,
+.seek-slider:focus::-webkit-slider-thumb,
+.seek-slider::-moz-range-thumb:hover,
+.seek-slider:focus::-moz-range-thumb,
+.seek-slider::-ms-thumb:hover,
+.seek-slider:focus::-ms-ms-thumb {
+    transform: scale(1.2); /* Slightly larger on hover */
+}
+
+
+.player-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Smaller gap between buttons */
+    margin-left: 10px; /* Space between duration and buttons */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.player-buttons i {
+    cursor: pointer; /* Specific cursor for buttons */
+    color: white; /* All icons white */
+    font-size: 1.2em; /* Default icon size for skip/back */
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Skip/back buttons more transparent */
+.player-buttons #prevBtn,
+.player-buttons #nextBtn {
+    opacity: 0.7;
+}
+
+.player-buttons i:hover {
+    transform: scale(1.1);
+    opacity: 1; /* Fully opaque on hover */
+}
+
+#playPauseBtn {
+    font-size: 1.5em; /* Play/pause button is now smaller */
+}
+
+
+/* Top-Left Volume Control - REFINED for no extra space when not hovered */
+.volume-control-top-left {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center; /* Vertically center content */
+    justify-content: center; /* Center horizontally when collapsed */
+    gap: 0; /* Initial gap */
+    padding: 0 10px; /* Horizontal padding, no vertical padding as height is fixed */
+    background: rgba(30, 40, 55, 0.85); /* Background color */
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Border */
+    border-radius: 8px;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    overflow: hidden; /* Important for clean transitions */
+    white-space: nowrap; /* Prevent content wrapping */
+
+    /* Fixed height for the control (adjust based on desired icon size + padding) */
+    height: 38px;
+    /* Initial width is auto, let content dictate it */
+    width: auto;
+    
+    transition: width 0.3s ease-out, background 0.3s ease, border-color 0.3s ease, gap 0.3s ease-out, justify-content 0.3s ease-out;
+}
+
+.volume-control-top-left:hover {
+    /* Full width when expanded: Icon width + 10px gap + 80px slider width + 2*10px padding */
+    width: calc(1.1em + 10px + 80px + 20px);
+    background: rgba(30, 40, 55, 0.95);
+    border-color: rgba(255, 255, 255, 0.15);
+    gap: 10px; /* Gap appears on hover */
+    justify-content: flex-start; /* Align to start when expanded */
+}
+
+#volumeIconTopLeft {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 1.1em; /* Adjust this to control icon size and thus overall height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Use pointer for the volume icon */
+    flex-shrink: 0;
+    /* No padding/margin on the icon itself, parent's padding and flexbox handle alignment */
+}
+
+
+.volume-slider-top-left {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0px; /* Start with 0 width */
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1.5px;
+    outline: none;
+    cursor: grab; /* Use grab for the volume slider */
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    flex-shrink: 0;
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Initially not visible */
+    transition: width 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.volume-control-top-left:hover .volume-slider-top-left {
+    width: 80px; /* Expanded width */
+    opacity: 1; /* Fully visible */
+    visibility: visible; /* Make visible */
+}
+
+
+/* Thumb for the top-left volume slider */
+.volume-slider-top-left::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: grab; /* Maintain grab for the thumb */
+    margin-top: -4.5px;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.volume-slider-top-left::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -4.5px;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.volume-slider-top-left::-ms-thumb {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: grab;
+    margin-top: -4.5px;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+
+/* General site element styles (remain largely unchanged) */
+.main-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.link-card {
+    background-color: rgba(31, 47, 69, 0.7);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #e0e0e0;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid rgba(157, 198, 255, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    flex-basis: calc(50% - 15px);
+    max-width: 250px;
+    min-width: 200px;
+    cursor: pointer; /* Use pointer for clickable cards */
+}
+
+.link-card:hover {
+    background-color: rgba(31, 47, 69, 0.9);
+    transform: translateY(-3px);
+}
+
+.link-card i {
+    font-size: 1.5em;
+    margin-right: 10px;
+    color: #9dc6ff;
+}
+
+.link-text {
+    text-align: left;
+}
+
+.link-text h2 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #ffffff;
+}
+
+.link-text p {
+    margin: 3px 0 0;
+    font-size: 0.8em;
+    color: #aaccff;
+}
+
+.footer-stats {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #9dc6ff;
+    font-size: 0.9em;
+    text-shadow: 0 0 5px rgba(157, 198, 255, 0.5);
+    white-space: nowrap;
+    display: flex; /* Make it a flex container */
+    align-items: center; /* Vertically align icon and text */
+    gap: 5px; /* Spacing between icon and number */
+    cursor: default; /* Keep default for non-interactive text */
+}
+
+/* Style for the eye icon in footer */
+.footer-stats i {
+    font-size: 1.1em; /* Slightly larger icon for better visibility */
+    color: #9dc6ff; /* Match text color */
+}
+
+/* Customization Panel Styles (Fullscreen) */
+.customize-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #9dc6ff;
+    color: #0b1a2b;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer; /* Pointer for the button */
+    font-size: 1em;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 10px rgba(157, 198, 255, 0.5);
+}
+
+.customize-toggle-btn:hover {
+    background-color: #ffffff;
+}
+
+.customization-panel {
+    position: fixed;
+    bottom: -100vh; /* Starts off-screen at the bottom */
+    left: 0; /* Aligned to the left */
+    width: 100vw;
+    height: 100vh;
+    /* Modern Look */
+    background: rgba(17, 34, 51, 0.9); /* Slightly darker, more opaque background */
+    backdrop-filter: blur(15px); /* Stronger blur for frosted glass effect */
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle top border */
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5); /* Shadow for lift-off effect */
+    padding: 20px;
+    transition: bottom 0.5s ease-in-out; /* Transition from bottom */
+    z-index: 1001;
+    overflow-y: auto;
+    box-sizing: border-box;
+    color: #e0e0e0;
+    cursor: default; /* Default cursor for the panel background */
+}
+
+.customization-panel.open {
+    bottom: 0; /* Slides up to fill the screen */
+}
+
+.customization-panel h2 {
+    color: #9dc6ff;
+    margin-top: 0;
+    border-bottom: 1px solid #334d66;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.customization-section {
+    margin-bottom: 20px;
+}
+
+.customization-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #aaccff;
+}
+
+.customization-section input[type="text"],
+.customization-section input[type="color"],
+.customization-section input[type="number"] {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid #334d66;
+    background-color: #2a3e57;
+    color: #eee;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: text; /* Text cursor for input fields */
+}
+
+.customization-section input[type="range"] {
+    width: calc(100% - 60px);
+    vertical-align: middle;
+    cursor: grab; /* Grab cursor for range sliders */
+}
+
+.customization-section span {
+    margin-left: 10px;
+    color: #aaccff;
+}
+
+.customization-panel button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; /* Pointer for general buttons */
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+#resetCustomizations {
+    background-color: #dc3545;
+    color: white;
+}
+
+#resetCustomizations:hover {
+    background-color: #c82333;
+}
+
+.close-panel-btn {
+    /* Position for bottom-sliding panel */
+    position: absolute; /* Position relative to .customization-panel */
+    top: 20px; /* Adjust as needed for spacing */
+    right: 20px; /* Adjust as needed for spacing */
+    width: auto; /* Allow button to size itself */
+    background-color: #9dc6ff;
+    color: #0b1a2b;
+    padding: 8px 15px; /* Adjust padding */
+    cursor: pointer; /* Pointer for the close button */
+}
+
+.close-panel-btn:hover {
+    background-color: #ffffff;
+}
+
+/* Styles for dynamically added link inputs in customization panel */
+.link-customization-item,
+.social-link-customization-item {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(157, 198, 255, 0.1);
+    position: relative;
+}
+
+.link-customization-item label,
+.social-link-customization-item label {
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    color: #b3d9ff;
+}
+
+.link-customization-item input[type="text"],
+.social-link-customization-item input[type="text"] {
+    width: calc(100% - 20px);
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    cursor: text; /* Text cursor for input fields */
+}
+
+.remove-link-btn,
+.remove-social-link-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 0.8em;
+    cursor: pointer; /* Pointer for remove buttons */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.remove-link-btn:hover,
+.remove-social-link-btn:hover {
+    background-color: #c82333;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.5em;
+    }
+    .social-icon {
+        font-size: 2em;
+    }
+    .link-card {
+        padding: 10px 15px;
+        flex-basis: 90%;
+        max-width: none;
+        min-width: unset;
+    }
+    .link-card i {
+        font-size: 1.2em;
+    }
+    .link-text h2 {
+        font-size: 1em;
+    }
+    .link-text p {
+        font-size: 0.7em;
+    }
+    .customization-panel {
+        width: 100vw;
+        bottom: -100vh; /* Start off-screen */
+    }
+    .customization-panel.open {
+        bottom: 0; /* Slide up fully */
+    }
+    .splash-content h1 {
+        font-size: 1.2em;
+    }
+    .customize-toggle-btn {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+    .footer-stats {
+        bottom: 10px;
+    }
+    .music-player {
+        flex-direction: row; /* Keep as row on mobile for this design */
+        text-align: left;
+        padding: 10px 15px;
+        max-width: 95%; /* Can be wider on mobile */
+    }
+    .album-art {
+        margin-right: 10px; /* Keep margin right for horizontal layout */
+        margin-bottom: 0;
+    }
+    .player-content {
+        flex-grow: 1;
+    }
+    .song-metadata {
+        margin-bottom: 5px;
+    }
+    .progress-line-and-times {
+        width: 100%;
+        margin: 0;
+        flex-wrap: wrap; /* Allow wrapping on very small screens if needed */
+        justify-content: space-between; /* Distribute items */
+    }
+    .player-buttons {
+        gap: 8px;
+        font-size: 1em;
+        margin-left: 0; /* Adjust as part of the gap */
+        width: 100%; /* Take full width on wrap */
+        justify-content: center; /* Center buttons if they wrap */
+        margin-top: 5px; /* Space from line if wrapped */
+    }
+    #playPauseBtn {
+        font-size: 1.6em;
+    }
+    /* Top-left volume control on mobile */
+    .volume-control-top-left {
+        top: 10px;
+        left: 10px;
+        height: 34px; /* Consistent height on mobile */
+        width: auto; /* Let content dictate width */
+        padding: 0 10px;
+    }
+    .volume-control-top-left:hover {
+        width: calc(1em + 10px + 60px + 20px); /* Icon (16px) + 10px gap + 60px slider + 2x 10px padding = ~106px */
+    }
+    #volumeIconTopLeft {
+        font-size: 1em; /* This means 16px */
+    }
+    .volume-slider-top-left {
+        width: 0px; /* Start with 0 width on mobile too */
+    }
+    .volume-control-top-left:hover .volume-slider-top-left {
+        width: 60px; /* Expanded width on mobile */
+    }
+}

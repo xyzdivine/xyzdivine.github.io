@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="siteTitle">divine</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <h1>click to enter...</h1>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="background-full-image"></div>
+
+        <div class="volume-control-top-left" id="volumeControlTopLeft">
+            <i class="fas fa-volume-up" id="volumeIconTopLeft"></i>
+            <input type="range" class="volume-slider-top-left" id="volumeSliderTopLeft" min="0" max="1" step="0.01" value="0.7">
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <h1 id="siteName">divine</h1>
+                <p id="siteDescription">this is my divine presence</p>
+            </div>
+            <div class="social-links" id="socialLinksContainer">
+                </div>
+
+            <div class="music-player">
+                <img src="assets/album_art.jpg" alt="Album Art" class="album-art" id="albumArt">
+                <div class="player-content">
+                    <div class="song-metadata">
+                        <span id="playerSongTitle">Superpowers</span>
+                        </div>
+                    <div class="progress-line-and-times">
+                        <span id="currentTime">0:00</span>
+                        <div class="progress-bar-container">
+                            <input type="range" class="seek-slider" id="seekSlider" value="0" min="0" max="100">
+                        </div>
+                        <span id="duration">2:54</span>
+                        <div class="player-buttons">
+                            <i class="fas fa-step-backward" id="prevBtn"></i>
+                            <i class="fas fa-pause" id="playPauseBtn"></i>
+                            <i class="fas fa-step-forward" id="nextBtn"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-links" id="mainLinksContainer">
+                </div>
+
+            <div class="footer-stats">
+                <i class="fas fa-eye"></i> <span>181</span>
+            </div>
+        </div>
+
+        <button class="customize-toggle-btn" id="customizeToggleBtn">Customize</button>
+
+        <div class="customization-panel" id="customizationPanel">
+            <h2>Customize Your Site</h2>
+            <div class="customization-section">
+                <label for="siteNameInput">Site Name:</label>
+                <input type="text" id="siteNameInput" value="divine">
+            </div>
+            <div class="customization-section">
+                <label for="siteDescriptionInput">Site Description:</label>
+                <input type="text" id="siteDescriptionInput" value="this is my divine presence">
+            </div>
+            <div class="customization-section">
+                <label for="viewsCountInput">Views Count:</label>
+                <input type="number" id="viewsCountInput" value="181" min="0">
+            </div>
+            <div class="customization-section">
+                <label for="backgroundUrlInput">Background Image URL:</label>
+                <input type="text" id="backgroundUrlInput" value="background.jpg">
+            </div>
+            <div class="customization-section">
+                <label for="bgOpacityInput">Background Opacity:</label>
+                <input type="range" id="bgOpacityInput" min="0.5" max="1" step="0.01" value="0.8">
+                <span id="bgOpacityValue">0.80</span>
+            </div>
+            <div class="customization-section">
+                <label for="mainColorInput">Main Color (Text, Icons):</label>
+                <input type="color" id="mainColorInput" value="#9dc6ff">
+            </div>
+            <div class="customization-section">
+                <label for="subColorInput">Sub Text Color (Description):</label>
+                <input type="color" id="subColorInput" value="#aaccff">
+            </div>
+             <div class="customization-section">
+                <label for="cardBgColorInput">Card Background Color:</label>
+                <input type="color" id="cardBgColorInput" value="#1f2f45">
+            </div>
+
+            <hr style="border-color: #334d66; margin: 20px 0;">
+            <h3>Music Player</h3>
+            <div class="customization-section">
+                <label for="songTitleInput">Song Title:</label>
+                <input type="text" id="songTitleInput" value="Superpowers">
+            </div>
+            <div class="customization-section">
+                <label for="artistNameInput">Artist Name:</label>
+                <input type="text" id="artistNameInput" value="Tegam Sharem">
+            </div>
+            <div class="customization-section">
+                <label for="albumArtInput">Album Art URL:</label>
+                <input type="text" id="albumArtInput" value="assets/album_art.jpg">
+            </div>
+            <div class="customization-section">
+                <label for="audioSourceInput">Audio File URL:</label>
+                <input type="text" id="audioSourceInput" value="assets/audio.mp3">
+            </div>
+            <div class="customization-section">
+                <label for="volumeInput">Volume:</label>
+                <input type="range" id="volumeInput" min="0" max="1" step="0.01" value="0.7">
+                <span id="volumeValue">70%</span>
+            </div>
+
+
+            <hr style="border-color: #334d66; margin: 20px 0;">
+            <h3>Social Links</h3>
+            <div id="socialLinkCustomizationSections">
+                </div>
+            <button id="addSocialLinkBtn" style="background-color: #28a745; color: white;">Add New Social Link</button>
+
+            <hr style="border-color: #334d66; margin: 20px 0;">
+            <h3>Customize Links</h3>
+            <div id="linkCustomizationSections">
+                </div>
+            <button id="addLinkBtn" style="background-color: #28a745; color: white;">Add New Link</button>
+
+            <button id="resetCustomizations">Reset to Default</button>
+            <button class="close-panel-btn" id="closePanelBtn">Close</button>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" src="assets/audio.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

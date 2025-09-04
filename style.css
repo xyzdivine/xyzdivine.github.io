@@ -3,7 +3,7 @@
 body {
     margin: 0;
     font-family: 'Satoshi', sans-serif; /* Changed font to Satoshi */
-    background-color: #0b1a2b; /* Dark blue background - fallback */
+    background-color: #000000; /* Dark blue background - fallback */
     color: #aaccff; /* Light blue text color */
     display: flex;
     justify-content: center;
@@ -295,6 +295,7 @@ body {
     transition: transform 0.2s ease;
 }
 
+
 .seek-slider::-webkit-slider-thumb:hover,
 .seek-slider:focus::-webkit-slider-thumb,
 .seek-slider::-moz-range-thumb:hover,
@@ -519,182 +520,6 @@ body {
     color: #9dc6ff; /* Match text color */
 }
 
-/* Customization Panel Styles (Fullscreen) */
-.customize-toggle-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #9dc6ff;
-    color: #0b1a2b;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer; /* Pointer for the button */
-    font-size: 1em;
-    z-index: 1000;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 0 10px rgba(157, 198, 255, 0.5);
-}
-
-.customize-toggle-btn:hover {
-    background-color: #ffffff;
-}
-
-.customization-panel {
-    position: fixed;
-    bottom: -100vh; /* Starts off-screen at the bottom */
-    left: 0; /* Aligned to the left */
-    width: 100vw;
-    height: 100vh;
-    /* Modern Look */
-    background: rgba(17, 34, 51, 0.9); /* Slightly darker, more opaque background */
-    backdrop-filter: blur(15px); /* Stronger blur for frosted glass effect */
-    -webkit-backdrop-filter: blur(15px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle top border */
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5); /* Shadow for lift-off effect */
-    padding: 20px;
-    transition: bottom 0.5s ease-in-out; /* Transition from bottom */
-    z-index: 1001;
-    overflow-y: auto;
-    box-sizing: border-box;
-    color: #e0e0e0;
-    cursor: default; /* Default cursor for the panel background */
-}
-
-.customization-panel.open {
-    bottom: 0; /* Slides up to fill the screen */
-}
-
-.customization-panel h2 {
-    color: #9dc6ff;
-    margin-top: 0;
-    border-bottom: 1px solid #334d66;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-.customization-section {
-    margin-bottom: 20px;
-}
-
-.customization-section label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #aaccff;
-}
-
-.customization-section input[type="text"],
-.customization-section input[type="color"],
-.customization-section input[type="number"] {
-    width: calc(100% - 10px);
-    padding: 8px;
-    border: 1px solid #334d66;
-    background-color: #2a3e57;
-    color: #eee;
-    border-radius: 4px;
-    font-size: 1em;
-    cursor: text; /* Text cursor for input fields */
-}
-
-.customization-section input[type="range"] {
-    width: calc(100% - 60px);
-    vertical-align: middle;
-    cursor: grab; /* Grab cursor for range sliders */
-}
-
-.customization-section span {
-    margin-left: 10px;
-    color: #aaccff;
-}
-
-.customization-panel button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer; /* Pointer for general buttons */
-    font-size: 1em;
-    transition: background-color 0.3s ease;
-}
-
-#resetCustomizations {
-    background-color: #dc3545;
-    color: white;
-}
-
-#resetCustomizations:hover {
-    background-color: #c82333;
-}
-
-.close-panel-btn {
-    /* Position for bottom-sliding panel */
-    position: absolute; /* Position relative to .customization-panel */
-    top: 20px; /* Adjust as needed for spacing */
-    right: 20px; /* Adjust as needed for spacing */
-    width: auto; /* Allow button to size itself */
-    background-color: #9dc6ff;
-    color: #0b1a2b;
-    padding: 8px 15px; /* Adjust padding */
-    cursor: pointer; /* Pointer for the close button */
-}
-
-.close-panel-btn:hover {
-    background-color: #ffffff;
-}
-
-/* Styles for dynamically added link inputs in customization panel */
-.link-customization-item,
-.social-link-customization-item {
-    background-color: rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    border: 1px solid rgba(157, 198, 255, 0.1);
-    position: relative;
-}
-
-.link-customization-item label,
-.social-link-customization-item label {
-    font-size: 0.9em;
-    margin-bottom: 5px;
-    color: #b3d9ff;
-}
-
-.link-customization-item input[type="text"],
-.social-link-customization-item input[type="text"] {
-    width: calc(100% - 20px);
-    margin-bottom: 8px;
-    box-sizing: border-box;
-    cursor: text; /* Text cursor for input fields */
-}
-
-.remove-link-btn,
-.remove-social-link-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    font-size: 0.8em;
-    cursor: pointer; /* Pointer for remove buttons */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.2s ease;
-}
-
-.remove-link-btn:hover,
-.remove-social-link-btn:hover {
-    background-color: #c82333;
-}
-
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -791,4 +616,39 @@ body {
     .volume-control-top-left:hover .volume-slider-top-left {
         width: 60px; /* Expanded width on mobile */
     }
+}
+/* Styles for the new link box */
+.custom-link-box {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 10px;
+    padding: 15px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid rgba(157, 198, 255, 0.2);
+}
+
+.custom-link-box:hover {
+    background-color: rgba(31, 47, 69, 0.9);
+    transform: translateY(-3px);
+}
+
+.custom-link-anchor {
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+.custom-link-text {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: center;
+    display: block;
+    width: 100%;
 }

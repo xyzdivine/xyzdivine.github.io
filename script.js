@@ -31,45 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeIconTopLeft = document.getElementById('volumeIconTopLeft');
     const volumeSliderTopLeft = document.getElementById('volumeSliderTopLeft');
 
-
-    // Customization panel elements
-    const customizeToggleBtn = document.getElementById('customizeToggleBtn');
-    const customizationPanel = document.getElementById('customizationPanel');
-    const closePanelBtn = document.getElementById('closePanelBtn');
-    const siteNameInput = document.getElementById('siteNameInput');
-    const siteDescriptionInput = document.getElementById('siteDescriptionInput');
-    const viewsCountInput = document.getElementById('viewsCountInput');
-    const albumArtInput = document.getElementById('albumArtInput');
-    const songTitleInput = document.getElementById('songTitleInput');
-    const artistNameInput = document.getElementById('artistNameInput');
-    const audioSourceInput = document.getElementById('audioSourceInput');
-    const backgroundUrlInput = document.getElementById('backgroundUrlInput');
-    const bgOpacityInput = document.getElementById('bgOpacityInput');
-    const bgOpacityValue = document.getElementById('bgOpacityValue');
-    const mainColorInput = document.getElementById('mainColorInput');
-    const subColorInput = document.getElementById('subColorInput');
-    const cardBgColorInput = document.getElementById('cardBgColorInput');
-    const resetCustomizationsBtn = document.getElementById('resetCustomizations');
-
-    // Volume customization input
-    const volumeInput = document.getElementById('volumeInput');
-    const volumeValueSpan = document.getElementById('volumeValue');
-
-
     // Link Customization Elements
     const mainLinksContainer = document.getElementById('mainLinksContainer');
-    const linkCustomizationSections = document.getElementById('linkCustomizationSections');
-    const addLinkBtn = document.getElementById('addLinkBtn');
 
     // Social Link Customization Elements
     const socialLinksContainer = document.getElementById('socialLinksContainer');
-    const socialLinkCustomizationSections = document.getElementById('socialLinkCustomizationSections');
-    const addSocialLinkBtn = document.getElementById('addSocialLinkBtn');
 
     // Default values (for reset functionality)
     const defaultSettings = {
         siteName: 'divine',
-        siteDescription: 'this is my divine presence',
+        siteDescription: '400+ vouches - click below for my market',
         viewsCount: 181,
         albumArtUrl: 'assets/album_art.jpg',
         songTitle: 'Superpowers',
@@ -158,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         siteDescription.style.color = settings.subColor;
         footerStats.style.color = settings.mainColor;
         footerStats.style.textShadow = `0 0 5px ${settings.mainColor}80`;
-        viewsIcon.style.color = settings.mainColor;
+        // viewsIcon.style.color = settings.mainColor; // viewsIcon is not in the html, commented out.
 
         // Music player colors (times only)
         currentTimeSpan.style.color = settings.subColor;
@@ -167,24 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply volume setting
         audioPlayer.volume = settings.volume;
         volumeSliderTopLeft.value = settings.volume;
-        volumeInput.value = settings.volume;
-        volumeValueSpan.textContent = `${Math.round(settings.volume * 100)}%`;
         updateVolumeIcon(settings.volume);
-
-        // Update input values in the panel
-        siteNameInput.value = settings.siteName;
-        siteDescriptionInput.value = settings.siteDescription;
-        viewsCountInput.value = settings.viewsCount;
-        albumArtInput.value = settings.albumArtUrl;
-        songTitleInput.value = settings.songTitle;
-        artistNameInput.value = settings.artistName;
-        audioSourceInput.value = settings.audioSource;
-        backgroundUrlInput.value = settings.backgroundUrl;
-        bgOpacityInput.value = settings.bgOpacity;
-        bgOpacityValue.textContent = parseFloat(settings.bgOpacity).toFixed(2);
-        mainColorInput.value = settings.mainColor;
-        subColorInput.value = settings.subColor;
-        cardBgColorInput.value = settings.cardBgColor;
 
         // Set seek slider max based on audio duration
         if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
@@ -197,181 +151,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Re-render social links and their customization inputs
         renderSocialLinks(settings.socialLinks, settings.mainColor);
-        renderSocialLinkCustomizationInputs(settings.socialLinks);
 
         // Re-render main links and their customization inputs
         renderLinks(settings.links, settings.mainColor, settings.subColor, settings.cardBgColor);
-        renderLinkCustomizationInputs(settings.links);
-
-        // Update customization panel colors
-        customizeToggleBtn.style.backgroundColor = settings.mainColor;
-        customizeToggleBtn.style.color = getComputedStyle(document.body).backgroundColor;
-        customizeToggleBtn.style.boxShadow = `0 0 10px ${settings.mainColor}80`;
-        customizationPanel.style.backgroundColor = settings.cardBgColor;
-        customizationPanel.style.borderColor = `${settings.mainColor}33`;
-        customizationPanel.querySelector('h2').style.color = settings.mainColor;
-        customizationPanel.querySelectorAll('.customization-section label, .customization-section span, h3').forEach(el => {
-            el.style.color = settings.subColor;
-        });
-        customizationPanel.querySelectorAll('input[type="text"], input[type="color"], input[type="number"], input[type="range"]').forEach(input => {
-            input.style.borderColor = `${settings.mainColor}33`;
-            input.style.backgroundColor = '#2a3e57';
-        });
-        resetCustomizationsBtn.style.backgroundColor = '#dc3545';
-        closePanelBtn.style.backgroundColor = settings.mainColor;
-        closePanelBtn.style.color = getComputedStyle(document.body).backgroundColor;
-        addLinkBtn.style.backgroundColor = '#28a745';
-        addLinkBtn.style.color = 'white';
-        addSocialLinkBtn.style.backgroundColor = '#28a745';
-        addSocialLinkBtn.style.color = 'white';
     }
 
     // Load settings from Local Storage or apply defaults
     function loadSettings() {
         const savedSettings = JSON.parse(localStorage.getItem('siteCustomizations'));
         if (savedSettings) {
-            currentSettings = { ...defaultSettings, ...savedSettings };
-            currentSettings.links = savedSettings.links ? savedSettings.links.map(link => ({ ...defaultSettings.links[0], ...link })) : defaultSettings.links;
-            currentSettings.socialLinks = savedSettings.socialLinks ? savedSettings.socialLinks.map(link => ({ ...defaultSettings.socialLinks[0], ...link })) : defaultSettings.socialLinks;
+            // Only apply a limited set of customizations if they exist, but don't show the panel
+            currentSettings = { ...defaultSettings,
+                siteName: savedSettings.siteName || defaultSettings.siteName,
+                siteDescription: savedSettings.siteDescription || defaultSettings.siteDescription,
+                viewsCount: savedSettings.viewsCount || defaultSettings.viewsCount,
+                albumArtUrl: savedSettings.albumArtUrl || defaultSettings.albumArtUrl,
+                songTitle: savedSettings.songTitle || defaultSettings.songTitle,
+                artistName: savedSettings.artistName || defaultSettings.artistName,
+                audioSource: savedSettings.audioSource || defaultSettings.audioSource,
+                backgroundUrl: savedSettings.backgroundUrl || defaultSettings.backgroundUrl,
+                bgOpacity: savedSettings.bgOpacity || defaultSettings.bgOpacity,
+                mainColor: savedSettings.mainColor || defaultSettings.mainColor,
+                subColor: savedSettings.subColor || defaultSettings.subColor,
+                cardBgColor: savedSettings.cardBgColor || defaultSettings.cardBgColor,
+                volume: savedSettings.volume || defaultSettings.volume,
+                socialLinks: savedSettings.socialLinks || defaultSettings.socialLinks,
+                links: savedSettings.links || defaultSettings.links,
+            };
         } else {
-            currentSettings = { ...defaultSettings };
+            currentSettings = { ...defaultSettings
+            };
         }
         applySettings(currentSettings);
     }
 
-    // Save settings to Local Storage
+    // Save settings to Local Storage - This function is now simplified as inputs are removed
     function saveSettings() {
-        currentSettings.siteName = siteNameInput.value;
-        currentSettings.siteDescription = siteDescriptionInput.value;
-        currentSettings.viewsCount = parseInt(viewsCountInput.value);
-        currentSettings.albumArtUrl = albumArtInput.value;
-        currentSettings.songTitle = songTitleInput.value;
-        currentSettings.artistName = artistNameInput.value;
-        currentSettings.audioSource = audioSourceInput.value;
-        currentSettings.backgroundUrl = backgroundUrlInput.value;
-        currentSettings.bgOpacity = parseFloat(bgOpacityInput.value);
-        currentSettings.mainColor = mainColorInput.value;
-        currentSettings.subColor = subColorInput.value;
-        currentSettings.cardBgColor = cardBgColorInput.value;
-        currentSettings.volume = parseFloat(volumeInput.value);
-
-
         localStorage.setItem('siteCustomizations', JSON.stringify(currentSettings));
     }
 
-    // --- Customization Panel Event Listeners ---
-    siteNameInput.addEventListener('input', () => {
-        siteTitle.textContent = siteNameInput.value;
-        siteName.textContent = siteNameInput.value;
-        saveSettings();
-    });
-    siteDescriptionInput.addEventListener('input', () => {
-        siteDescription.textContent = siteDescriptionInput.value;
-        saveSettings();
-    });
-    viewsCountInput.addEventListener('input', () => {
-        viewsCountSpan.textContent = viewsCountInput.value;
-        saveSettings();
-    });
-    albumArtInput.addEventListener('input', () => {
-        albumArt.src = albumArtInput.value;
-        saveSettings();
-    });
-    songTitleInput.addEventListener('input', () => {
-        playerSongTitle.textContent = songTitleInput.value;
-        saveSettings();
-    });
-    artistNameInput.addEventListener('input', () => {
-        saveSettings();
-    });
-    audioSourceInput.addEventListener('input', () => {
-        const wasPlaying = !audioPlayer.paused;
-        audioPlayer.src = audioSourceInput.value;
-        audioPlayer.load();
-        if (wasPlaying) {
-            audioPlayer.play().catch(e => console.error("Autoplay prevented:", e));
-        } else {
-            playPauseBtn.classList.remove('fa-pause');
-            playPauseBtn.classList.add('fa-play');
-            isPlaying = false;
-        }
-        saveSettings();
-    });
-    backgroundUrlInput.addEventListener('input', () => {
-        backgroundFullImage.style.backgroundImage = `url('${backgroundUrlInput.value}')`;
-        saveSettings();
-    });
-    bgOpacityInput.addEventListener('input', () => {
-        backgroundFullImage.style.opacity = bgOpacityInput.value;
-        bgOpacityValue.textContent = parseFloat(bgOpacityInput.value).toFixed(2);
-        saveSettings();
-    });
-    mainColorInput.addEventListener('input', () => {
-        currentSettings.mainColor = mainColorInput.value;
-        applySettings(currentSettings);
-        saveSettings();
-    });
-    subColorInput.addEventListener('input', () => {
-        currentSettings.subColor = subColorInput.value;
-        applySettings(currentSettings);
-    });
-    cardBgColorInput.addEventListener('input', () => {
-        currentSettings.cardBgColor = cardBgColorInput.value;
-        applySettings(currentSettings);
-        saveSettings();
-    });
-
-    // Volume Input in Customization Panel
-    volumeInput.addEventListener('input', () => {
-        const newVolume = parseFloat(volumeInput.value);
-        audioPlayer.volume = newVolume;
-        volumeSliderTopLeft.value = newVolume; // Update top-left slider
-        volumeValueSpan.textContent = `${Math.round(newVolume * 100)}%`;
-        updateVolumeIcon(newVolume); // Update icon on volume change
-        saveSettings();
-    });
-
-    // Main Link Customization Button Listener
-    addLinkBtn.addEventListener('click', addLink);
-
-    // Social Link Customization Button Listener
-    addSocialLinkBtn.addEventListener('click', addSocialLink);
-
-    // Toggle customization panel
-    customizeToggleBtn.addEventListener('click', () => {
-        customizationPanel.classList.add('open');
-    });
-    closePanelBtn.addEventListener('click', () => {
-        customizationPanel.classList.remove('open');
-    });
-
-    // Reset to default
-    resetCustomizationsBtn.addEventListener('click', () => {
-        localStorage.removeItem('siteCustomizations');
-        currentSettings = { ...defaultSettings };
-        currentSettings.links = defaultSettings.links.map(link => ({...link}));
-        currentSettings.socialLinks = defaultSettings.socialLinks.map(link => ({...link}));
-
-        applySettings(currentSettings);
-        bgOpacityInput.min = 0.5;
-        bgOpacityInput.max = 1;
-        bgOpacityInput.value = defaultSettings.bgOpacity;
-        bgOpacityValue.textContent = parseFloat(defaultSettings.bgOpacity).toFixed(2);
-        audioPlayer.src = defaultSettings.audioSource;
-        audioPlayer.load();
-        audioPlayer.volume = defaultSettings.volume; // Reset volume
-        volumeSliderTopLeft.value = defaultSettings.volume;
-        volumeInput.value = defaultSettings.volume;
-        volumeValueSpan.textContent = `${Math.round(defaultSettings.volume * 100)}%`;
-        updateVolumeIcon(defaultSettings.volume);
-
-        if (isPlaying) {
-             audioPlayer.pause();
-             playPauseBtn.classList.remove('fa-pause');
-             playPauseBtn.classList.add('fa-play');
-             isPlaying = false;
-        }
-    });
 
     // --- Music Player Logic ---
     audioPlayer.addEventListener('loadedmetadata', () => {
@@ -379,11 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
         seekSlider.max = audioPlayer.duration;
         // Keep initial play icon if not playing
         if (audioPlayer.paused) {
-             playPauseBtn.classList.remove('fa-pause');
-             playPauseBtn.classList.add('fa-play');
+            playPauseBtn.classList.remove('fa-pause');
+            playPauseBtn.classList.add('fa-play');
         } else {
-             playPauseBtn.classList.remove('fa-play');
-             playPauseBtn.classList.add('fa-pause');
+            playPauseBtn.classList.remove('fa-play');
+            playPauseBtn.classList.add('fa-pause');
         }
         updatePlayerUI(); // Call once metadata is loaded
     });
@@ -448,9 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
     volumeSliderTopLeft.addEventListener('input', () => {
         const newVolume = parseFloat(volumeSliderTopLeft.value);
         audioPlayer.volume = newVolume;
-        volumeInput.value = newVolume; // Update customization panel slider
-        volumeValueSpan.textContent = `${Math.round(newVolume * 100)}%`;
         updateVolumeIcon(newVolume);
+        // This is the only place we need to manually update and save settings now
+        currentSettings.volume = newVolume;
         saveSettings();
     });
 
@@ -464,9 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
             audioPlayer.volume = lastVolume > 0 ? lastVolume : 0.7; // Restore or default
         }
         volumeSliderTopLeft.value = audioPlayer.volume;
-        volumeInput.value = audioPlayer.volume;
-        volumeValueSpan.textContent = `${Math.round(audioPlayer.volume * 100)}%`;
         updateVolumeIcon(audioPlayer.volume);
+        currentSettings.volume = audioPlayer.volume;
         saveSettings();
     });
 
@@ -494,69 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderLinkCustomizationInputs(links) {
-        linkCustomizationSections.innerHTML = '';
-        links.forEach((link, index) => {
-            const linkItem = document.createElement('div');
-            linkItem.classList.add('customization-section', 'link-customization-item');
-            linkItem.setAttribute('data-link-id', link.id);
-
-            linkItem.innerHTML = `
-                <label>Link ${index + 1} Title:</label>
-                <input type="text" data-link-prop="title" value="${link.title}">
-                <label>Link ${index + 1} URL:</label>
-                <input type="text" data-link-prop="url" value="${link.url}">
-                <label>Link ${index + 1} Icon Class (e.g., fas fa-link):</label>
-                <input type="text" data-link-prop="icon" value="${link.icon}">
-                <label>Link ${index + 1} Description:</label>
-                <input type="text" data-link-prop="description" value="${link.description}">
-                <button class="remove-link-btn" data-link-id="${link.id}">X</button>
-            `;
-            linkCustomizationSections.appendChild(linkItem);
-        });
-
-        linkCustomizationSections.querySelectorAll('input[data-link-prop]').forEach(input => {
-            input.addEventListener('input', updateLinkFromInput);
-        });
-        linkCustomizationSections.querySelectorAll('.remove-link-btn').forEach(button => {
-            button.addEventListener('click', removeLink);
-        });
-    }
-
-    function updateLinkFromInput(event) {
-        const input = event.target;
-        const linkId = parseInt(input.closest('.link-customization-item').getAttribute('data-link-id'));
-        const prop = input.getAttribute('data-link-prop');
-        const value = input.value;
-
-        const linkIndex = currentSettings.links.findIndex(link => link.id === linkId);
-        if (linkIndex !== -1) {
-            currentSettings.links[linkIndex][prop] = value;
-            saveSettings();
-            renderLinks(currentSettings.links, currentSettings.mainColor, currentSettings.subColor, currentSettings.cardBgColor);
-        }
-    }
-
-    function addLink() {
-        const newId = Date.now();
-        const newLink = {
-            id: newId,
-            title: 'New Link',
-            url: '#',
-            icon: 'fas fa-plus',
-            description: 'New Description'
-        };
-        currentSettings.links.push(newLink);
-        saveSettings();
-        applySettings(currentSettings);
-    }
-
-    function removeLink(event) {
-        const linkIdToRemove = parseInt(event.target.getAttribute('data-link-id'));
-        currentSettings.links = currentSettings.links.filter(link => link.id !== linkIdToRemove);
-        saveSettings();
-        applySettings(currentSettings);
-    }
 
     // --- Social Link Customization Functions ---
     function renderSocialLinks(socialLinks, mainColor) {
@@ -569,64 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
             socialIconElement.innerHTML = `<i class="${socialLink.icon}" style="color: ${mainColor}; text-shadow: 0 0 8px ${mainColor}80;"></i>`;
             socialLinksContainer.appendChild(socialIconElement);
         });
-    }
-
-    function renderSocialLinkCustomizationInputs(socialLinks) {
-        socialLinkCustomizationSections.innerHTML = '';
-        socialLinks.forEach((socialLink, index) => {
-            const socialLinkItem = document.createElement('div');
-            socialLinkItem.classList.add('customization-section', 'social-link-customization-item');
-            socialLinkItem.setAttribute('data-link-id', socialLink.id);
-
-            socialLinkItem.innerHTML = `
-                <label>Social Link ${index + 1} Icon Class (e.g., fab fa-discord):</label>
-                <input type="text" data-link-prop="icon" value="${socialLink.icon}">
-                <label>Social Link ${index + 1} URL:</label>
-                <input type="text" data-link-prop="url" value="${socialLink.url}">
-                <button class="remove-social-link-btn" data-link-id="${socialLink.id}">X</button>
-            `;
-            socialLinkCustomizationSections.appendChild(socialLinkItem);
-        });
-
-        socialLinkCustomizationSections.querySelectorAll('input[data-link-prop]').forEach(input => {
-            input.addEventListener('input', updateSocialLinkFromInput);
-        });
-        socialLinkCustomizationSections.querySelectorAll('.remove-social-link-btn').forEach(button => {
-            button.addEventListener('click', removeSocialLink);
-        });
-    }
-
-    function updateSocialLinkFromInput(event) {
-        const input = event.target;
-        const linkId = parseInt(input.closest('.social-link-customization-item').getAttribute('data-link-id'));
-        const prop = input.getAttribute('data-link-prop');
-        const value = input.value;
-
-        const linkIndex = currentSettings.socialLinks.findIndex(link => link.id === linkId);
-        if (linkIndex !== -1) {
-            currentSettings.socialLinks[linkIndex][prop] = value;
-            saveSettings();
-            renderSocialLinks(currentSettings.socialLinks, currentSettings.mainColor);
-        }
-    }
-
-    function addSocialLink() {
-        const newId = Date.now();
-        const newSocialLink = {
-            id: newId,
-            icon: 'fas fa-globe',
-            url: '#'
-        };
-        currentSettings.socialLinks.push(newSocialLink);
-        saveSettings();
-        applySettings(currentSettings);
-    }
-
-    function removeSocialLink(event) {
-        const linkIdToRemove = parseInt(event.target.getAttribute('data-link-id'));
-        currentSettings.socialLinks = currentSettings.socialLinks.filter(link => link.id !== linkIdToRemove);
-        saveSettings();
-        applySettings(currentSettings);
     }
 
     // Handle splash screen click
@@ -657,5 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure music player UI is updated on initial load, even if paused
     audioPlayer.addEventListener('loadeddata', () => {
         updatePlayerUI();
-    }, { once: true });
+    }, {
+        once: true
+    });
 });

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@xyzdivine</title>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <style>
+        :root {
+            --bg: #030303;
+            --card: #080808;
+            --border: rgba(255, 255, 255, 0.08);
+            --star: #4169e1; 
+            --text-main: #ffffff;
+            --text-dim: #888; 
+            --id-color: #555;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+            --accent: #4169e1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #cursor-dot {
+            width: 8px; height: 8px;
+            background: white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 100001;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s var(--ease), width 0.3s, height 0.3s;
+        }
+
+        /* Snow system */
+        .snow-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .snow {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.4;
+            filter: blur(1px);
+            animation: fall linear infinite;
+        }
+        @keyframes fall { 
+            0% { transform: translateY(-10vh) translateX(0); } 
+            50% { transform: translateY(50vh) translateX(15px); }
+            100% { transform: translateY(110vh) translateX(0); } 
+        }
+
+        /* ROUNDED SQUARE CART - TOP RIGHT */
+        #cart-trigger {
+            position: fixed; top: 30px; right: 30px; 
+            background: var(--card); border: 1px solid var(--border);
+            color: white; width: 55px; height: 55px; border-radius: 12px;
+            display: none; 
+            align-items: center; justify-content: center;
+            z-index: 999; transition: 0.4s var(--ease);
+        }
+        #cart-trigger:hover { border-color: var(--star); transform: translateY(-3px); background: #0c0c0c; }
+        
+        #cart-count { 
+            position: absolute; top: -5px; right: -5px; 
+            background: var(--star); color: white; 
+            font-size: 0.7rem; font-weight: 900; 
+            width: 20px; height: 20px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(65, 105, 225, 0.4);
+        }
+
+        /* CART DRAWER */
+        .cart-drawer {
+            position: fixed; top: 0; right: -400px; width: 400px; height: 100%; 
+            background: #0a0a0a; border-left: 1px solid var(--border); 
+            z-index: 10001; transition: right 0.5s var(--ease);
+            display: flex; flex-direction: column; padding: 40px 30px;
+        }
+        .cart-drawer.active { right: 0; } 
+        .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 20px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .qty-controls { display: flex; align-items: center; gap: 10px; background: #111; padding: 5px; border-radius: 8px; border: 1px solid var(--border); }
+        .qty-btn { background: none; border: none; color: #fff; width: 25px; height: 25px; cursor: none !important; transition: 0.2s; }
+        .qty-btn:hover { color: var(--star); }
+
+        /* Page System */
+        .page {
+            display: none; width: 100%; min-height: 100vh; padding: 80px 20px;
+            z-index: 1; position: relative; opacity: 0; transition: opacity 0.5s var(--ease);
+        }
+        .page.active { display: flex; flex-direction: column; align-items: center; opacity: 1; }
+
+        #home-page { justify-content: center; text-align: center; }
+        .hero-title { font-size: 3rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 20px; font-weight: 600; }
+        
+        .nav-btn {
+            background: transparent; color: white; border: 1px solid var(--border);
+            padding: 14px 30px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.2em; transition: 0.3s var(--ease); text-transform: uppercase;
+        }
+        .nav-btn:hover { background: var(--star); border-color: var(--star); transform: translateY(-2px); }
+
+        .nav-btn-alt {
+            background: rgba(255,255,255,0.03); color: white; border: 1px solid var(--border);
+            padding: 14px 30px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 0.2em; transition: 0.3s var(--ease); text-transform: uppercase;
+            width: 100%; margin-top: 10px;
+        }
+        .nav-btn-alt:hover { background: rgba(255,255,255,0.08); border-color: #555; }
+
+        .container { max-width: 1100px; width: 100%; text-align: center; }
+        
+        .back-btn-ui {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            color: var(--text-dim); padding: 8px 16px; border-radius: 8px;
+            font-size: 0.65rem; letter-spacing: 1px; margin-bottom: 25px;
+            display: inline-block; transition: 0.3s; font-weight: 700;
+        }
+        .back-btn-ui:hover { color: #fff; border-color: var(--star); background: rgba(65, 105, 225, 0.1); }
+
+        /* VENDOR GRID */
+        .vendor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px; width: 100%; margin-top: 30px;
+        }
+        .vendor-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; transition: 0.4s var(--ease); text-align: left;
+        }
+        .vendor-card:hover { transform: translateY(-8px); border-color: var(--star); }
+        .vendor-img { width: 100%; height: 140px; background: #111; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border); font-weight: 900; color: #1a1a1a; font-size: 2rem; }
+        .vendor-info { padding: 20px; }
+        .vendor-name { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+        .vendor-desc { font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; margin-bottom: 15px; height: 40px; }
+        .vendor-footer { display: flex; flex-direction: column; gap: 12px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .buy-btn, .cart-add-btn {
+            padding: 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; transition: 0.3s var(--ease); border: none;
+        }
+        .buy-btn { background: var(--star); color: white; }
+        .cart-add-btn { background: rgba(255,255,255,0.03); color: #fff; border: 1px solid var(--border); }
+        .cart-add-btn:hover { background: rgba(255,255,255,0.08); }
+
+        /* CHECKOUT PAGE */
+        .checkout-container {
+            max-width: 500px; width: 100%; background: var(--card);
+            border: 1px solid var(--border); border-radius: 24px; padding: 40px; text-align: left;
+            min-height: 480px;
+        }
+        .form-label { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 8px; }
+        .form-input {
+            width: 100%; background: #0c0c0c; border: 1px solid var(--border);
+            padding: 14px 18px; border-radius: 10px; color: white; font-size: 0.9rem;
+            transition: 0.3s; outline: none; margin-bottom: 20px;
+        }
+        .form-input:focus { border-color: var(--star); background: #111; }
+        .order-summary {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 16px; padding: 25px; margin-top: 10px;
+        }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85rem; }
+        .total-row { border-top: 1px solid var(--border); margin-top: 15px; padding-top: 15px; font-weight: 700; font-size: 1.1rem; }
+
+        /* PAYMENT MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(12px);
+            z-index: 20000; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.4s var(--ease);
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .payment-panel {
+            background: #0a0a0a; border: 1px solid var(--border);
+            width: 95%; max-width: 420px; border-radius: 24px; padding: 32px;
+            transform: translateY(30px); transition: 0.5s var(--ease);
+        }
+        .modal-overlay.active .payment-panel { transform: translateY(0); }
+        .crypto-item {
+            display: flex; flex-direction: column; align-items: center;
+            background: #0d0d0d; border: 1px solid var(--border);
+            padding: 18px 10px; border-radius: 14px; transition: 0.3s;
+        }
+        .crypto-item.selected { border-color: var(--star); background: rgba(65, 105, 225, 0.1); }
+
+        /* COPY BUTTON STYLES */
+        .copy-btn-wrapper {
+            display: flex; align-items: center; gap: 12px; background: #000;
+            padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+        .copy-btn-wrapper button {
+            background: none; border: none; color: var(--text-dim);
+            transition: 0.3s var(--ease); flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+        }
+        .copy-btn-wrapper button:hover { color: #fff; }
+        .copy-btn-wrapper button.success { color: #26a17b; transform: scale(1.1); }
+
+        /* ANIMATIONS FOR ORDER PAGE */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade { animation: fadeInUp 0.6s var(--ease) forwards; }
+        .delay-1 { animation-delay: 0.1s; opacity: 0; }
+        .delay-2 { animation-delay: 0.2s; opacity: 0; }
+
+        /* VOUCH SYSTEM STYLES */
+        .rating-bar {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: rgba(255,255,255,0.02); padding: 10px 24px;
+            border-radius: 6px; border: 1px solid var(--border); margin-bottom: 40px;
+        }
+        .rating-num { color: var(--star); font-weight: 800; font-size: 0.9rem; }
+        .rating-label { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        .vouch-grid { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; padding-top: 10px; 
+        }
+        @media (max-width: 900px) { .vouch-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .vouch-box {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 22px; border-radius: 8px; text-align: left;
+            transition: all 0.4s var(--ease); display: flex; flex-direction: column;
+        }
+        .vouch-box:hover { border-color: var(--star); transform: translateY(-5px); }
+        .vouch-box.hidden-item { display: none; opacity: 0; }
+        .vouch-box.reveal { display: flex; animation: boxReveal 0.5s var(--ease) forwards; }
+        
+        @keyframes boxReveal {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .vouch-id { color: var(--id-color); font-family: monospace; font-size: 0.75rem; font-weight: 700; }
+        .stars { color: var(--star); font-size: 0.85rem; margin: 8px 0; }
+        .vouch-text { color: #efefef; font-size: 0.85rem; line-height: 1.5; flex-grow: 1; }
+
+        .grid-wrapper.clamped { max-height: 800px; overflow: hidden; position: relative; }
+        .grid-wrapper.clamped::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 200px;
+            background: linear-gradient(to top, var(--bg), transparent); pointer-events: none;
+        }
+
+        #view-all-btn {
+            margin-top: 40px; padding: 14px 40px; background: transparent;
+            border: 1px solid var(--border); color: #fff; font-size: 0.75rem;
+            letter-spacing: 2px; font-weight: 600; transition: 0.3s;
+        }
+        #view-all-btn:hover { background: var(--star); border-color: var(--star); }
+
+        /* CONTACT STYLES */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .contact-card {
+            background: var(--card); border: 1px solid var(--border);
+            padding: 40px 20px; border-radius: 16px; text-align: center;
+            transition: 0.4s var(--ease); text-decoration: none; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            height: 280px;
+        }
+        .contact-card:hover { transform: translateY(-5px); }
+        .contact-card.discord:hover { border-color: #5865F2; background: rgba(88, 101, 242, 0.05); }
+        .contact-card.telegram:hover { border-color: #0088cc; background: rgba(0, 136, 204, 0.05); }
+        
+        .contact-icon { 
+            height: 100px; 
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .discord-img { width: 100px !important; height: auto !important; }
+        .telegram-img { width: 60px !important; height: auto !important; }
+
+        .contact-label { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        .contact-handle { color: #fff; font-weight: 700; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div class="snow-container" id="snow"></div>
+
+<div id="cart-trigger" onclick="toggleCart()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+    <div id="cart-count">0</div>
+</div>
+
+<div class="cart-drawer" id="cart-drawer">
+    <div style="display:flex; justify-content: space-between; align-items:center;">
+        <h2 style="letter-spacing: 2px; font-size: 1.2rem;">CART</h2>
+        <button class="back-btn-ui" onclick="toggleCart()" style="margin:0;">CLOSE</button>
+    </div>
+    <div class="cart-items-list" id="cart-items-list"></div>
+    <div style="margin-top:20px; padding-top:20px; border-top: 1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:700;">
+            <span>TOTAL</span>
+            <span id="cart-total-price">$0.00</span>
+        </div>
+        <button class="nav-btn" style="width:100%; background:var(--star); border:none;" onclick="handleCheckoutButton()">CHECKOUT</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="payment-modal">
+    <div class="payment-panel">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h2 id="modal-product-name">Payment</h2>
+            <p style="color:var(--text-dim); font-size:0.8rem;">Select payment method</p>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:25px;">
+            <div class="crypto-item" onclick="selectCrypto(this, 'BTC')"><span style="color:#f7931a; font-weight:bold; font-size: 1.2rem;">₿ BTC</span></div>
+            <div class="crypto-item" onclick="selectCrypto(this, 'ETH')"><span style="color:#627eea; font-weight:bold; font-size: 1.2rem;">Ξ ETH</span></div>
+            <div class="crypto-item" onclick="selectCrypto(this, 'LTC')"><span style="color:#345d9d; font-weight:bold; font-size: 1.2rem;">Ł LTC</span></div>
+            <div class="crypto-item" onclick="selectCrypto(this, 'USDT')"><span style="color:#26a17b; font-weight:bold; font-size: 1.2rem;">₮ USDT</span></div>
+        </div>
+        <button class="nav-btn" id="pay-now-btn" style="width:100%; background:var(--star); border:none;" onclick="handleFinalPay()">Confirm & Pay</button>
+        <button class="nav-btn-alt" onclick="closeModal()">CANCEL</button>
+    </div>
+</div>
+
+<section id="order-page" class="page">
+    <div class="container">
+        <div class="checkout-container animate-fade" style="margin: 0 auto; max-width: 550px;">
+            <h1 style="font-size: 1.8rem; margin-bottom: 10px; letter-spacing: 2px;">ORDER #<span id="display-order-id">...</span></h1>
+            <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 30px;">Please send the exact amount to the address below.</p>
+
+            <div class="animate-fade delay-1" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 25px;">
+                <span class="form-label">Total Amount (<span id="display-crypto-amount-label">...</span>)</span>
+                <div class="copy-btn-wrapper" style="margin-bottom: 20px;">
+                    <span id="page-calc-coin-raw" style="font-family: monospace; font-size: 0.9rem; font-weight: 700; color: #fff; flex-grow: 1;">Calculating...</span>
+                    <button id="copy-amount-trigger" onclick="copyText('page-calc-coin-raw', 'copy-amount-trigger', 'icon-copy-amt', 'icon-check-amt')">
+                        <svg id="icon-copy-amt" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <svg id="icon-check-amt" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
+
+                <span class="form-label">Destination Address (<span id="display-crypto-name">...</span>)</span>
+                <div class="copy-btn-wrapper">
+                    <span id="page-dest-address" style="font-family: monospace; font-size: 0.75rem; word-break: break-all; color: #fff; flex-grow: 1;">-</span>
+                    <button id="copy-address-trigger" onclick="copyText('page-dest-address', 'copy-address-trigger', 'icon-copy-addr', 'icon-check-addr')">
+                        <svg id="icon-copy-addr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <svg id="icon-check-addr" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="animate-fade delay-2" style="margin-top: 30px; text-align: center;">
+                <p style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 20px;">The order will be processed automatically after 1 confirmation.</p>
+                <button class="nav-btn-alt" onclick="goBackToPayment()">BACK</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="free-delivery-page" class="page">
+    <div class="container">
+        <div class="checkout-container animate-fade" style="margin: 0 auto; max-width: 550px; text-align: center;">
+            <h1 style="font-size: 1.8rem; margin-bottom: 10px; letter-spacing: 2px;">PRODUCT DELIVERED</h1>
+            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px;">Thank you for your order. Here is your delivery information:</p>
+            
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+                <span class="form-label" style="text-align: center;">Supplier Link</span>
+                <div class="copy-btn-wrapper" style="justify-content: center; background: #111;">
+                    <span id="delivery-info-link" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--star); flex-grow: 1;">wa.me/16723384838</span>
+                    <button id="copy-delivery-trigger" onclick="copyText('delivery-info-link', 'copy-delivery-trigger', 'icon-copy-del', 'icon-check-del')">
+                        <svg id="icon-copy-del" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <svg id="icon-check-del" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="https://wa.me/16723384838" target="_blank" class="nav-btn" style="display: block; background: #25D366; border: none; text-decoration: none;">OPEN LINK</a>
+                </div>
+            </div>
+
+            <button class="nav-btn-alt" onclick="showPage('home-page')">RETURN HOME</button>
+        </div>
+    </div>
+</section>
+
+<section id="home-page" class="page">
+    <h1 class="hero-title">xyzdivine</h1>
+    <div class="nav-group">
+        <button class="nav-btn" onclick="showPage('archive-page')">REVIEWS</button>
+        <button class="nav-btn" onclick="showPage('vendor-page')">STORE</button>
+        <button class="nav-btn" onclick="showPage('contact-page')">CONTACT</button>
+    </div>
+</section>
+
+<section id="vendor-page" class="page">
+    <div class="container">
+        <button class="back-btn-ui" onclick="showPage('home-page')">← BACK TO HOME</button>
+        <h1 style="margin-bottom: 40px; letter-spacing: 5px;">STORE</h1>
+        <div class="vendor-grid" id="vendor-list"></div>
+    </div>
+</section>
+
+<section id="contact-page" class="page">
+    <div class="container">
+        <button class="back-btn-ui" onclick="showPage('home-page')">← BACK TO HOME</button>
+        <h1 style="margin-bottom: 40px; letter-spacing: 5px;">CONTACTS</h1>
+        
+        <div class="contact-grid">
+            <a href="https://discord.gg/emfddQ8j7X" target="_blank" class="contact-card discord">
+                <span class="contact-icon">
+                    <img src="assets/discord.png" alt="Discord" class="discord-img">
+                </span>
+                <div class="contact-label">Discord</div>
+                <div class="contact-handle">Fastest Response</div>
+            </a>
+
+            <a href="https://t.me/xyzdivine" target="_blank" class="contact-card telegram">
+                <span class="contact-icon">
+                    <img src="assets/telegram.png" alt="Telegram" class="telegram-img">
+                </span>
+                <div class="contact-label">Telegram</div>
+                <div class="contact-handle">Direct Chat</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section id="checkout-page" class="page">
+    <div class="container">
+        <button class="back-btn-ui" onclick="showPage('vendor-page')">← BACK TO STORE</button>
+        <div class="checkout-container" style="margin: 0 auto;">
+            <h2 style="margin-bottom: 30px; letter-spacing: 3px; font-size: 1.4rem;">CHECKOUT</h2>
+            
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" id="checkout-email" placeholder="example@gmail.com">
+            
+            <label class="form-label">Coupon Code</label>
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                <input type="text" class="form-input" id="coupon-input" placeholder="Optional" style="margin:0;">
+                <button class="buy-btn" onclick="applyCoupon()" style="height:50px; padding: 0 20px;">Apply</button>
+            </div>
+
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span id="sum-items-count" style="color:var(--text-dim)">Items (0)</span>
+                    <span id="sum-base-price">$0.00</span>
+                </div>
+                <div id="discount-row" class="summary-row" style="display:none; color: #26a17b;">
+                    <span>Coupon Discount</span>
+                    <span id="sum-discount">-$0.00</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Total Due</span>
+                    <span id="sum-total">$0.00</span>
+                </div>
+            </div>
+
+            <button class="nav-btn" style="width:100%; background:var(--star); border:none; margin-top:30px;" onclick="proceedToPayment()">Proceed to Payment</button>
+        </div>
+    </div>
+</section>
+
+<section id="archive-page" class="page">
+    <div class="container">
+        <button class="back-btn-ui" onclick="showPage('home-page')">← BACK TO HOME</button>
+        <h1 style="margin-bottom: 15px; letter-spacing: 5px;">VOUCHES</h1>
+        <div class="rating-bar">
+            <span class="rating-num">4.98/5.0</span>
+            <span class="rating-label">Average Rating</span>
+        </div>
+        <div class="grid-wrapper clamped" id="wrapper">
+            <div class="vouch-grid" id="grid"></div>
+        </div>
+        <button id="view-all-btn">LOAD ALL VOUCHES</button>
+    </div>
+</section>
+
+<script>
+    const vouchesNumber = 329
+
+    const dot = document.getElementById('cursor-dot');
+    window.addEventListener('mousemove', (e) => { dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px'; });
+
+    const products = [
+        { id: 1, name: 'FREE SUPPLIER', price: 0.00, desc: 'Quality supplier with competitive prices' },
+        { id: 2, name: 'BEST 1:1 SUPPLIERS', price: 9.99, desc: 'Includes electronics, apparel, and accessories' },
+        { id: 3, name: 'RESELLING GUIDE', price: 9.99, desc: 'A comprehensive business development guide' },
+        { id: 4, name: 'RANDOM CRYPTO WALLET', price: 29.99, desc: 'Exodus wallet encrypted key' },
+        { id: 5, name: 'Discord Nitro Boost - 1 Month', price: 3.99, desc: 'Full warranty included' },
+        { id: 6, name: 'Discord Nitro Boost - 1 Year', price: 19.99, desc: 'Full warranty included' },
+        { id: 7, name: 'Spotify Premium Account - 12 Months', price: 9.99, desc: 'Delivered via fresh account credentials' },
+        { id: 8, name: 'Spotify Premium Account - Unlimited', price: 19.99, desc: 'Lifetime access via fresh account credentials' }
+    ];
+
+    let cart = [];
+    let checkoutTotal = 0;
+    let selectedCryptoSym = null;
+
+    const paymentAddresses = {
+        'BTC': 'bc1qqdvune5s2s9xxqqhezr7xtmt0c5seef0m0mdk3',
+        'ETH': '0x2a3AAC4f98b2Ce9137622F8f6FA173B3595B18c5',
+        'LTC': 'LiJ6sLUksZVDSvuSRsRdrfBH2PrG8Pz5bF',
+        'USDT': '0x2a3AAC4f98b2Ce9137622F8f6FA173B3595B18c5'
+    };
+
+    const cgIds = { 'BTC': 'bitcoin', 'ETH': 'ethereum', 'LTC': 'litecoin', 'USDT': 'tether' };
+    
+    const fallbackRates = { 'BTC': 100000, 'ETH': 3300, 'LTC': 100, 'USDT': 1.00 };
+
+    function showPage(id) {
+        const activePages = document.querySelectorAll('.page.active');
+        activePages.forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+            p.style.opacity = '0';
+        });
+
+        const next = document.getElementById(id);
+        if (next) {
+            next.style.display = 'flex';
+            void next.offsetWidth;
+            next.classList.add('active');
+            next.style.opacity = '1';
+            window.scrollTo(0,0);
+            localStorage.setItem('currentPage', id);
+        }
+
+        const cartTrigger = document.getElementById('cart-trigger');
+        if (id === 'vendor-page') {
+            cartTrigger.style.display = 'flex';
+        } else {
+            cartTrigger.style.display = 'none';
+        }
+    }
+
+    function goBackToPayment() {
+        showPage('checkout-page');
+        localStorage.removeItem('lastOrder');
+    }
+
+    function populateVendors() {
+        const list = document.getElementById('vendor-list');
+        products.forEach(p => {
+            const card = document.createElement('div'); card.className = 'vendor-card';
+            card.innerHTML = `
+                <div class="vendor-img">${p.name.charAt(0)}</div>
+                <div class="vendor-info">
+                    <div class="vendor-name">${p.name}</div>
+                    <div class="vendor-desc">${p.desc}</div>
+                    <div class="vendor-footer">
+                        <div style="font-weight:700; font-size:1.1rem;">${p.price === 0 ? 'FREE' : '$' + p.price.toFixed(2)}</div>
+                        <div class="btn-group">
+                            <button class="buy-btn" onclick="directBuy(${p.id})">BUY NOW</button>
+                            <button class="cart-add-btn" onclick="addToCart(${p.id}, this)">+ CART</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function toggleCart() { document.getElementById('cart-drawer').classList.toggle('active'); }
+
+    function addToCart(id, btn) {
+        const p = products.find(x => x.id === id);
+        const exists = cart.find(x => x.id === id);
+        if(exists) exists.qty++; else cart.push({...p, qty: 1});
+        btn.innerText = "ADDED!";
+        setTimeout(() => btn.innerText = "+ CART", 1000);
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        const count = document.getElementById('cart-count');
+        const list = document.getElementById('cart-items-list');
+        count.innerText = cart.reduce((s, i) => s + i.qty, 0);
+        let total = 0;
+        list.innerHTML = cart.length ? cart.map(i => {
+            total += i.price * i.qty;
+            return `<div class="cart-item">
+                <div><div style="font-size:0.85rem; font-weight:600;">${i.name}</div><div style="font-size:0.7rem; color:var(--text-dim);">${i.price === 0 ? 'FREE' : '$' + i.price.toFixed(2)}</div></div>
+                <div class="qty-controls"><button class="qty-btn" onclick="changeQty(${i.id}, -1)">-</button><span>${i.qty}</span><button class="qty-btn" onclick="changeQty(${i.id}, 1)">+</button></div>
+            </div>`;
+        }).join('') : '<p style="text-align:center; color:var(--text-dim); margin-top:40px;">Empty Cart</p>';
+        document.getElementById('cart-total-price').innerText = `$${total.toFixed(2)}`;
+    }
+
+    function changeQty(id, d) {
+        const i = cart.find(x => x.id === id); i.qty += d;
+        if(i.qty <= 0) cart = cart.filter(x => x.id !== id);
+        updateCartUI();
+    }
+
+    function directBuy(id) {
+        const p = products.find(x => x.id === id);
+        if(p.price === 0) {
+            showPage('free-delivery-page');
+            return;
+        }
+        cart = [{...p, qty: 1}]; updateCartUI(); handleCheckoutButton();
+    }
+
+    function handleCheckoutButton() {
+        if(!cart.length) return;
+        const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+        if(total === 0) {
+            document.getElementById('cart-drawer').classList.remove('active');
+            showPage('free-delivery-page');
+            return;
+        }
+        checkoutTotal = total;
+        document.getElementById('sum-items-count').innerText = `Items (${cart.length})`;
+        document.getElementById('sum-base-price').innerText = `$${total.toFixed(2)}`;
+        document.getElementById('sum-total').innerText = `$${total.toFixed(2)}`;
+        document.getElementById('discount-row').style.display = 'none';
+        showPage('checkout-page');
+        document.getElementById('cart-drawer').classList.remove('active');
+    }
+
+    function applyCoupon() {
+        if(document.getElementById('coupon-input').value.toUpperCase() === 'DIVINE') {
+            const d = checkoutTotal * 0.1;
+            document.getElementById('discount-row').style.display = 'flex';
+            document.getElementById('sum-discount').innerText = `-$${d.toFixed(2)}`;
+            document.getElementById('sum-total').innerText = `$${(checkoutTotal - d).toFixed(2)}`;
+            alert('Coupon Applied!');
+        }
+    }
+
+    function proceedToPayment() {
+        const totalNow = parseFloat(document.getElementById('sum-total').innerText.replace('$',''));
+        if(totalNow <= 0) {
+            showPage('free-delivery-page');
+            return;
+        }
+        if(!document.getElementById('checkout-email').value.includes('@')) return alert('Valid email required.');
+        document.getElementById('payment-modal').classList.add('active');
+        selectedCryptoSym = null;
+        document.querySelectorAll('.crypto-item').forEach(i => i.classList.remove('selected'));
+    }
+
+    function selectCrypto(el, sym) {
+        document.querySelectorAll('.crypto-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedCryptoSym = sym;
+    }
+
+    async function handleFinalPay() {
+        if(!selectedCryptoSym) return alert("Please select a currency.");
+        const total = parseFloat(document.getElementById('sum-total').innerText.replace('$',''));
+        const orderId = Math.random().toString(36).substring(2, 8).toUpperCase();
+        closeModal();
+        const orderData = {
+            orderId: orderId,
+            cryptoSym: selectedCryptoSym,
+            totalUsd: total,
+            address: paymentAddresses[selectedCryptoSym],
+            cryptoAmount: null 
+        };
+        await renderOrderPage(orderData);
+        showPage('order-page');
+    }
+
+    async function renderOrderPage(data) {
+        document.getElementById('display-order-id').innerText = data.orderId;
+        document.getElementById('display-crypto-name').innerText = data.cryptoSym;
+        document.getElementById('display-crypto-amount-label').innerText = data.cryptoSym;
+        document.getElementById('page-dest-address').innerText = data.address;
+        if(data.cryptoAmount) {
+            document.getElementById('page-calc-coin-raw').innerText = data.cryptoAmount;
+            return;
+        }
+        document.getElementById('page-calc-coin-raw').innerText = "Calculating...";
+        try {
+            const id = cgIds[data.cryptoSym];
+            const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`);
+            const cgData = await res.json();
+            const rate = cgData[id].usd;
+            const amount = (data.totalUsd / rate).toFixed(data.cryptoSym === 'BTC' || data.cryptoSym === 'ETH' ? 8 : 4);
+            document.getElementById('page-calc-coin-raw').innerText = amount;
+            data.cryptoAmount = amount;
+            localStorage.setItem('lastOrder', JSON.stringify(data));
+        } catch(e) { 
+            const rate = fallbackRates[data.cryptoSym];
+            const amount = (data.totalUsd / rate).toFixed(data.cryptoSym === 'BTC' || data.cryptoSym === 'ETH' ? 8 : 4);
+            document.getElementById('page-calc-coin-raw').innerText = amount;
+            data.cryptoAmount = amount;
+            localStorage.setItem('lastOrder', JSON.stringify(data));
+        }
+    }
+
+    function copyText(elementId, btnId, iconId, checkId) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById(btnId);
+            const iconCopy = document.getElementById(iconId);
+            const iconCheck = document.getElementById(checkId);
+            btn.classList.add('success');
+            iconCopy.style.display = 'none';
+            iconCheck.style.display = 'block';
+            setTimeout(() => {
+                btn.classList.remove('success');
+                iconCopy.style.display = 'block';
+                iconCheck.style.display = 'none';
+            }, 2000);
+        });
+    }
+
+    function closeModal() { document.getElementById('payment-modal').classList.remove('active'); }
+
+    populateVendors();
+
+    const reviewPool = [
+        "LEGIT AF", "Fast and reliable", "Best supplier", "bought 3 suppliers", "Nice service", 
+        "Legit 2 nitro", "10/10 service", "Ty 4x nitro", "Awesome", "W coupon", 
+        "Fast delivery", "Competitive prices", "Top tier seller", "Instant delivery", 
+        "Super smooth process", "highly recommended!", "Great support", "Excellent"
+    ];
+    
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    let masterList = [];
+    while (masterList.length < vouchesNumber) { masterList = masterList.concat(shuffle([...reviewPool])); }
+
+    const grid = document.getElementById('grid');
+    for (let i = 0; i < vouchesNumber; i++) {
+        const box = document.createElement('div');
+        box.className = i < 24 ? 'vouch-box' : 'vouch-box hidden-item';
+        box.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><span class="vouch-id">#${(vouchesNumber-i).toString().padStart(3, '0')}</span><div class="stars">★★★★★</div></div><p class="vouch-text">"${masterList[i]}"</p>`;
+        grid.appendChild(box);
+    }
+
+    document.getElementById('view-all-btn').onclick = function() {
+        document.getElementById('wrapper').classList.remove('clamped');
+        this.style.display = 'none';
+        document.querySelectorAll('.hidden-item').forEach((item, index) => {
+            setTimeout(() => { item.classList.remove('hidden-item'); item.classList.add('reveal'); }, index * 2); 
+        });
+    }
+
+    const sn = document.getElementById('snow');
+    for(let i=0; i<100; i++) {
+        let f = document.createElement('div'); f.className = 'snow';
+        const size = Math.random() * 3 + 1 + 'px';
+        f.style.width = size; f.style.height = size;
+        f.style.left = Math.random() * 100 + 'vw';
+        f.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        f.style.animationDelay = (Math.random() * -10) + 's'; 
+        sn.appendChild(f);
+    }
+
+    window.addEventListener('load', () => {
+        const savedPage = localStorage.getItem('currentPage');
+        const lastOrder = localStorage.getItem('lastOrder');
+        
+        if (savedPage === 'order-page' && lastOrder) {
+            const data = JSON.parse(lastOrder);
+            renderOrderPage(data);
+            showPage('order-page');
+        } else if (savedPage && document.getElementById(savedPage)) {
+            showPage(savedPage);
+        } else {
+            showPage('home-page');
+        }
+    });
+</script>
+</body>
+</html>
